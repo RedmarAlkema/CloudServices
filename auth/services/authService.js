@@ -1,26 +1,28 @@
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const User = require('../models/user'); 
+const User = require('../models/user');
 
-class AuthService {
-    async registerUser(username, email, password) {
-        const salt = await bcrypt.genSalt(10);
-        const hashedPassword = await bcrypt.hash(password, salt);
-        const newUser = new User({ username, email, password: hashedPassword });
-        await newUser.save();
-        return newUser;
-    }
+const register = async ({ username, email, password, role }) => {
+  const hashedPassword = await bcrypt.hash(password, 10);
+  const user = new User({ username, email, password: hashedPassword, role });
+  await user.save();
+  return user;
+};
 
-    async loginUser(email, password) {
-        const user = await User.findOne({ email });
-        if (!user) throw new Error('Invalid credentials');
+const login = async ({ username, password }) => {
+  const user = await User.findOne({ username });
+  if (!user) throw new Error('Gebruiker niet gevonden');
 
-        const isMatch = await bcrypt.compare(password, user.password);
-        if (!isMatch) throw new Error('Invalid credentials');
+  const match = await bcrypt.compare(password, user.password);
+  if (!match) throw new Error('Wachtwoord klopt niet');
 
-        const token = jwt.sign({ id: user._id, role: user.role }, process.env.JWT_SECRET, { expiresIn: '1h' });
-        return token;
-    }
-}
+  const token = jwt.sign(
+    { userId: user._id, role: user.role },
+    process.env.JWT_SECRET,
+    { expiresIn: '1h' }
+  );
 
-module.exports = new AuthService();
+  return token;
+};
+
+module.exports = { register, login };
