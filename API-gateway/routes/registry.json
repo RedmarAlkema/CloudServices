@@ -1,0 +1,10 @@
+{
+    "services": {
+        "target":{
+            "apiName": "target",
+            "host": "http://localhost",
+            "port": "3003",
+            "url": "http://localhost:3003/"
+        }
+    }
+}
