@@ -11,14 +11,14 @@ module.exports = (req, res, next) => {
 
   const token = authHeader.split(" ")[1];
 
-  console.log("🔐 Binnengekomen token:", token);
-  console.log("🔑 JWT_SECRET in .env:", process.env.JWT_SECRET);
+  console.log("🔐TARGET Binnengekomen token:", token);
+  console.log("🔑TARGET JWT_SECRET in .env:", process.env.JWT_SECRET);
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     req.user = decoded;
     next();
   } catch (err) {
-    return res.status(401).json({ msg: "Token is ongeldig" });
+    return res.status(401).json({ msg: "Target: Token is ongeldig" });
   }
 };
