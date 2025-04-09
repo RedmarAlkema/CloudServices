@@ -14,7 +14,7 @@ const uploadFile = async (req, res) => {
         data: req.file.buffer,
         contentType: req.file.mimetype
       },
-      userId,
+      userId: req.user.userId,
       targetId,
       contentType: req.file.mimetype
     });
