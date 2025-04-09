@@ -1,10 +1,14 @@
 const targetService = require("../services/targetService");
 const Target = require('../models/Target');
+const { publishTargetCreated } = require('../services/messageQueue');
 
 exports.createTarget = async (req, res) => {
     try {
       const target = new Target({ ...req.body, ownerId: req.user.userId });
       await target.save();
+
+      await publishTargetCreated(target);
+
       res.status(201).json(target);
     } catch (err) {
       res.status(500).json({ message: err.message });
