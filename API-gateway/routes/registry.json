@@ -5,6 +5,12 @@
             "host": "http://localhost",
             "port": "3003",
             "url": "http://localhost:3003/"
+        },
+        "upload": {
+            "apiName": "upload",
+            "host": "http://localhost",
+            "port": "3002",
+            "url": "http://localhost:3002/"
         }
     }
 }
