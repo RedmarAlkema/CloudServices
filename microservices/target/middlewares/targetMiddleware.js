@@ -11,9 +11,6 @@ module.exports = (req, res, next) => {
 
   const token = authHeader.split(" ")[1];
 
-  console.log("🔐TARGET Binnengekomen token:", token);
-  console.log("🔑TARGET JWT_SECRET in .env:", process.env.JWT_SECRET);
-
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     req.user = decoded;

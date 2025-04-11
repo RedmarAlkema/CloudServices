@@ -1,6 +1,6 @@
 {
     "services": {
-        "target":{
+        "target": {
             "apiName": "target",
             "host": "http://localhost",
             "port": "3003",
@@ -11,6 +11,12 @@
             "host": "http://localhost",
             "port": "3002",
             "url": "http://localhost:3002/"
+        },
+        "read": {
+            "apiName": "read",
+            "host": "http://localhost",
+            "port": "3004",
+            "url": "http://localhost:3004/"
         }
     }
 }
