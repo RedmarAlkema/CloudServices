@@ -1,12 +1,16 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
 const targetSchema = new mongoose.Schema({
   title: String,
   location: String,
   description: String,
-  imageUrl: String,
+  img: {
+    data: Buffer,
+    contentType: String,
+  },
+  radius: Number,
   deadline: Date,
-  ownerId: String
+  ownerId: String,
 }, { timestamps: true });
 
-module.exports = mongoose.model('Target', targetSchema);
+module.exports = mongoose.model("Target", targetSchema);

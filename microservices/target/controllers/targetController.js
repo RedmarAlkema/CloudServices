@@ -1,35 +1,65 @@
 const Target = require('../models/Target');
-const { publishTargetCreated } = require('../services/messageQueue');
 
-exports.createTarget = async (req, res) => {
+exports.getTargetFromRequest = async (req) => {
   try {
-    const { title, location, description, radius, deadline } = req.body;
-
-    let imageFile = null;
-    if (req.files && req.files.length > 0) {
-      imageFile = req.files.find(f => f.fieldname === "img");
+    if (!req.files || req.files.length === 0) {
+      return res.status(400).json({ message: 'Geen bestand meegegeven' });
     }
 
-    const target = new Target({
+    const file = req.files[0]; 
+
+    const { title, location, description, radius, deadline } = req.body;
+
+    const newTarget = new Target({
       title,
       location,
       description,
+      img: {
+        data: file.buffer,
+        contentType: file.mimetype
+      },
       radius,
       deadline,
-      ownerId: req.user.userId,
-      img: imageFile ? {
-        data: imageFile.buffer,
-        contentType: imageFile.mimetype
-      } : undefined
+      ownerId: req.user.userId
+    });
+  
+  return newTarget;
+
+} catch (error) {
+  console.error(error);
+  res.status(500).json({ message: 'Er is iets fout gegaan bij het uploaden' });
+}
+};
+
+exports.uploadTarget = async (req, res) => {
+  try {
+    if (!req.files || req.files.length === 0) {
+      return res.status(400).json({ message: 'Geen bestand meegegeven' });
+    }
+
+    const file = req.files[0]; 
+
+    const { title, location, description, radius, deadline } = req.body;
+
+    const newTarget = new Target({
+      title,
+      location,
+      description,
+      img: {
+        data: file.buffer,
+        contentType: file.mimetype
+      },
+      radius,
+      deadline,
+      ownerId: req.user.userId
     });
 
-    await target.save();
-    await publishTargetCreated(target);
+    await newTarget.save();
+    res.status(201).json({ message: 'Bestand succesvol geüpload', file: newTarget });
 
-    res.status(201).json(target);
-  } catch (err) {
-    console.error("❌ Fout bij aanmaken target:", err);
-    res.status(500).json({ message: err.message });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Er is iets fout gegaan bij het uploaden' });
   }
 };
 
