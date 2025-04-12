@@ -7,19 +7,21 @@ async function consumeTarget() {
     const channel = await connection.createChannel();
 
     const exchangeName = "TargetExchange";
-    const routingKey = "Info";
-    const queueName = "target_created";
+    const queueName = "target_created"; // Je kan dit ook dynamisch maken als je een unieke queue per service wilt
 
-    await channel.assertExchange(exchangeName, "direct", { durable: true });
+    // 🔁 Zorg dat exchange type nu 'fanout' is
+    await channel.assertExchange(exchangeName, "fanout", { durable: true });
+
+    // 🎯 Queue aanmaken (mag durable zijn of niet, afhankelijk van je behoefte)
     await channel.assertQueue(queueName, { durable: true });
-    await channel.bindQueue(queueName, exchangeName, routingKey);
 
-    console.log("📥 Wachten op berichten...");
+    // 📌 Bind zonder routingKey (fanout gebruikt dat niet)
+    await channel.bindQueue(queueName, exchangeName, "");
+
+    console.log("📥 Wachten op berichten (fanout)...");
 
     channel.consume(queueName, async (msg) => {
       if (msg !== null) {
-
-        console.log(msg);
         const content = msg.content.toString();
         const targetData = JSON.parse(content);
 
@@ -41,12 +43,11 @@ async function consumeTarget() {
 
           await newTarget.save();
           console.log("✅ Target opgeslagen in read DB:", newTarget._id);
-          console.log("image: ", newTarget.img);
         } catch (err) {
           console.error("❌ Fout bij opslaan in MongoDB:", err.message);
         }
 
-        channel.ack(msg); 
+        channel.ack(msg);
       }
     });
   } catch (err) {

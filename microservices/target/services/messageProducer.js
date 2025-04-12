@@ -9,17 +9,19 @@ class Producer {
     this.channel = await connection.createChannel();
   }
 
-  async publishMessage(routingKey, target) {
+  async publishMessage(target) {
     if (!this.channel) {
       await this.createChannel();
     }
 
     if (typeof target.then === 'function') {
-        target = await target;
+      target = await target;
     }
 
     const exchangeName = config.rabbitMQ.exchangeName;
-    await this.channel.assertExchange(exchangeName, "direct", { durable: true });
+    
+    // ⚠️ Zet de exchange type op 'fanout'
+    await this.channel.assertExchange(exchangeName, "fanout", { durable: true });
 
     const imgData = target.img?.data 
       ? target.img.data.toString('base64') 
@@ -42,13 +44,13 @@ class Producer {
 
     this.channel.publish(
       exchangeName,
-      routingKey,
+      "", // leeg bij fanout
       Buffer.from(JSON.stringify(messagePayload))
     );
 
     console.log("target: ", target);
     console.log("message payload: ", messagePayload);
-    console.log(`✅ Bericht verzonden naar exchange "${exchangeName}" met routingKey "${routingKey}"`);
+    console.log(`✅ Bericht verzonden naar fanout exchange "${exchangeName}"`);
   }
 }
 
