@@ -1,3 +1,4 @@
+// readtargetService.js
 const amqp = require('amqplib');
 const Clock = require('../models/clock');
 
@@ -7,33 +8,35 @@ async function consumeTarget() {
         const channel = await connection.createChannel();
 
         const exchangeName = "TargetExchange";
-        const routingKey = "Info";
         const queueName = "target_created";
 
-        await channel.assertExchange(exchangeName, "direct", { durable: true });
+        await channel.assertExchange(exchangeName, "fanout", { durable: true }); // ← verander naar fanout
         await channel.assertQueue(queueName, { durable: true });
-        await channel.bindQueue(queueName, exchangeName, routingKey);
+        await channel.bindQueue(queueName, exchangeName, '');
 
         console.log("📥 Wachten op berichten...");
 
+        channel.consume(queueName, async (msg) => {
+            if (msg !== null) {
+                try {
+                    const targetData = JSON.parse(msg.content.toString());
+                    const newClock = new Clock({
+                        targetId: targetData.id,
+                        deadline: targetData.deadline,
+                    });
 
-        try {
-            const newClock = new Clock({
-                id: targetData.id,
-                deadline: targetData.deadline,
-            });
+                    await newClock.save();
+                    console.log("✅ Clock opgeslagen:", newClock._id);
 
-            await newClock.save();
-            console.log("✅ Clock opgeslagen in read DB:", newClock._id);
-        } catch (err) {
-            console.error("❌ Fout bij opslaan in MongoDB:", err.message);
-        }
-
-        channel.ack(msg);
-
-
+                    channel.ack(msg);
+                } catch (err) {
+                    console.error("❌ Fout bij verwerken bericht:", err.message);
+                    channel.nack(msg);
+                }
+            }
+        });
     } catch (err) {
-        console.error("❌ Fout bij verbinden met RabbitMQ:", err.message);
+        console.error("❌ Fout bij RabbitMQ:", err.message);
     }
 }
 
