@@ -1,7 +1,7 @@
 const amqp = require('amqplib');
-const Target = require('../models/Upload');
+const Upload = require('../models/Upload');
 
-async function consumeTarget() {
+async function consumeUpload() {
   try {
     const connection = await amqp.connect("amqp://localhost");
     const channel = await connection.createChannel();
@@ -24,7 +24,8 @@ async function consumeTarget() {
 
         try {
           const newUpload = new Upload({
-            filename: uploadData.filemane,
+            uploadId: uploadData.uploadId,
+            filename: uploadData.filename,
             img: uploadData.img
               ? {
                   data: Buffer.from(uploadData.img.data, 'base64'),
@@ -38,7 +39,7 @@ async function consumeTarget() {
           });
 
           await newUpload.save();
-          console.log("✅ Target opgeslagen in read DB:", newUpload._id);
+          console.log("✅ Upload opgeslagen in read DB:", newUpload._id);
         } catch (err) {
           console.error("❌ Fout bij opslaan in MongoDB:", err.message);
         }
@@ -51,4 +52,4 @@ async function consumeTarget() {
   }
 }
 
-module.exports = consumeTarget;
+module.exports = consumeUpload;

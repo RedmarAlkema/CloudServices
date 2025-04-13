@@ -7,7 +7,7 @@ async function consumeTarget() {
     const channel = await connection.createChannel();
 
     const exchangeName = "TargetExchange";
-    const queueName = "target_created"; 
+    const queueName = "target_score_queue"; 
 
     await channel.assertExchange(exchangeName, "fanout", { durable: true });
 
@@ -24,6 +24,7 @@ async function consumeTarget() {
 
         try {
           const newTarget = new Target({
+            targetId: targetData.targetId,
             title: targetData.title,
             location: targetData.location,
             description: targetData.description,

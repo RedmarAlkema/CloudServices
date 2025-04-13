@@ -20,7 +20,6 @@ class Producer {
 
     const exchangeName = config.rabbitMQ.exchangeName;
     
-    // ⚠️ Zet de exchange type op 'fanout'
     await this.channel.assertExchange(exchangeName, "fanout", { durable: true });
 
     const imgData = target.img?.data 
@@ -28,6 +27,7 @@ class Producer {
       : null;
 
     const messagePayload = {
+      targetId: target.targetId,
       title: target.title,
       location: target.location,
       description: target.description,
@@ -44,8 +44,9 @@ class Producer {
 
     this.channel.publish(
       exchangeName,
-      "", // leeg bij fanout
-      Buffer.from(JSON.stringify(messagePayload))
+      "", 
+      Buffer.from(JSON.stringify(messagePayload)),
+      { persistent: true }
     );
 
     console.log("target: ", target);

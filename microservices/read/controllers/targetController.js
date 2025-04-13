@@ -19,13 +19,13 @@ exports.getAllTargets = async (req, res) => {
 
 exports.getTargetById = async (req, res) => {
   try {
-    const target = await Target.findById(req.params.id);
+    const target = await Target.findOne({ targetId: req.params.id });
     if (!target) return res.status(404).json({ message: "Target niet gevonden" });
 
     const formatted = {
       ...target.toObject(),
       img: target.img?.data
-        ? `data:${target.img.contentType};base64,${target.img.data.toString("base64")}`
+        ? `data:${target.img.contentType};base64,${target.img.data.toString("base64")}` 
         : null
     };
 

@@ -1,4 +1,5 @@
 const Target = require('../models/Target');
+const mongoose = require("mongoose");
 
 exports.getTargetFromRequest = async (req) => {
   try {
@@ -7,10 +8,11 @@ exports.getTargetFromRequest = async (req) => {
     }
 
     const file = req.files[0]; 
-
     const { title, location, description, radius, deadline } = req.body;
+    const targetId = new mongoose.Types.ObjectId();
 
     const newTarget = new Target({
+      targetId,
       title,
       location,
       description,
@@ -38,10 +40,11 @@ exports.uploadTarget = async (req, res) => {
     }
 
     const file = req.files[0]; 
-
+    const targetId = new mongoose.Types.ObjectId();
     const { title, location, description, radius, deadline } = req.body;
 
     const newTarget = new Target({
+      targetId,
       title,
       location,
       description,

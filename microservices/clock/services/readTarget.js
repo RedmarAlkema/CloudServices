@@ -1,4 +1,3 @@
-// readtargetService.js
 const amqp = require('amqplib');
 const Clock = require('../models/clock');
 
@@ -8,9 +7,9 @@ async function consumeTarget() {
         const channel = await connection.createChannel();
 
         const exchangeName = "TargetExchange";
-        const queueName = "target_created";
+        const queueName = "target_clock_queue";
 
-        await channel.assertExchange(exchangeName, "fanout", { durable: true }); // ← verander naar fanout
+        await channel.assertExchange(exchangeName, "fanout", { durable: true }); 
         await channel.assertQueue(queueName, { durable: true });
         await channel.bindQueue(queueName, exchangeName, '');
 
@@ -20,8 +19,9 @@ async function consumeTarget() {
             if (msg !== null) {
                 try {
                     const targetData = JSON.parse(msg.content.toString());
+                    console.log("data: ", targetData);
                     const newClock = new Clock({
-                        targetId: targetData.id,
+                        targetId: targetData.targetId,
                         deadline: targetData.deadline,
                     });
 

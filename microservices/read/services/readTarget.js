@@ -7,15 +7,12 @@ async function consumeTarget() {
     const channel = await connection.createChannel();
 
     const exchangeName = "TargetExchange";
-    const queueName = "target_created"; // Je kan dit ook dynamisch maken als je een unieke queue per service wilt
+    const queueName = "target_read_queue";
 
-    // 🔁 Zorg dat exchange type nu 'fanout' is
     await channel.assertExchange(exchangeName, "fanout", { durable: true });
 
-    // 🎯 Queue aanmaken (mag durable zijn of niet, afhankelijk van je behoefte)
     await channel.assertQueue(queueName, { durable: true });
 
-    // 📌 Bind zonder routingKey (fanout gebruikt dat niet)
     await channel.bindQueue(queueName, exchangeName, "");
 
     console.log("📥 Wachten op berichten (fanout)...");
@@ -27,6 +24,7 @@ async function consumeTarget() {
 
         try {
           const newTarget = new Target({
+            targetId: targetData.targetId,
             title: targetData.title,
             location: targetData.location,
             description: targetData.description,
