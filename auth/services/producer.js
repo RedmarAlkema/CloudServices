@@ -30,8 +30,6 @@ class Producer {
       { persistent: true }
     );
 
-    console.log("✅ Gebruikersbericht verzonden naar exchange:", exchangeName);
-    console.log("📦 Payload:", messagePayload);
   }
 }
 

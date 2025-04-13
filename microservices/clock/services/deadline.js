@@ -39,15 +39,12 @@ const producer = new Producer();
 
 async function checkAndDeleteExpiredTargets() {
   try {
-    console.log("looking...");
     const clocks = await Clock.find();
 
     const currentTime = moment.tz('Europe/Amsterdam').toISOString();
 
     for (const clock of clocks) {
       const clockDeadline = moment.utc(clock.deadline).toISOString();
-
-      console.log('compare:', clockDeadline, currentTime);
 
       if (clockDeadline <= currentTime) {
         console.log(`❌ Deadline passed for target ${clock.targetId}. Sending to RabbitMQ...`);

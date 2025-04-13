@@ -7,11 +7,6 @@ const { uploadFile } = require('../controllers/uploadController');
 const { getUploadFromRequest } = require("../controllers/uploadController")
 const Producer = require("../services/messageProducer");
 
-router.post("/sendFile", auth, upload.any(), uploadFile, async (req, res, next) => {
-    await Producer.publishMessage("Info", uploadController.getUploadFromRequest(req))
-    res.send();
-});
-
 router.post("/", auth, upload.any(), async (req, res) => {
     try {
         const upload = await getUploadFromRequest(req);

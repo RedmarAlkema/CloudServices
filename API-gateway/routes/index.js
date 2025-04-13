@@ -48,11 +48,9 @@ router.all('/:apiName/*', authMiddleware, async (req, res) => {
   if (!service) {
     return res.status(404).json({ message: `Service "${apiName}" niet gevonden` });
   }
-  console.log("registry is gevonden: ",registry.services[apiName]);
 
   const subPath = req.originalUrl.split('/').slice(2).join('/');
   const targetUrl = `${service.url}${subPath}`;
-  console.log("target url gemaakt: ", targetUrl);
 
   try {
     const form = new FormData();
@@ -63,14 +61,12 @@ router.all('/:apiName/*', authMiddleware, async (req, res) => {
 
     if (req.files && req.files.length > 0) {
       req.files.forEach(file => {
-        console.log(`Bestand toegevoegd: ${file.originalname}, type: ${file.mimetype}`);
         form.append(file.fieldname, file.buffer, {
           filename: file.originalname,
           contentType: file.mimetype
         });
       });
     }
-    console.log("voorbij lijn 43");
 
     const response = await axios({
       method: req.method,
@@ -82,7 +78,6 @@ router.all('/:apiName/*', authMiddleware, async (req, res) => {
       },
       data: form 
     });
-    console.log("voorbij lijn 55");
 
     res.status(response.status).send(response.data);
   } catch (err) {

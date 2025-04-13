@@ -51,9 +51,7 @@ exports.getScore = async (req, res) => {
     const upload = await Upload.findOne({ uploadId: uploadId });
     if (!upload) return res.status(404).json({ msg: "Upload niet gevonden" });
 
-    console.log("Upload gevonden:", upload);
     const target = await Target.findOne({ targetId: upload.targetId });
-    console.log("Target gevonden:", target);
 
     if (!target) return res.status(404).json({ msg: "Target niet gevonden" });
 
@@ -77,7 +75,6 @@ exports.getScoreId = async (temp) => {
     if (!upload) return { msg: "geen upload target gevonden" }
 
     const target = await Target.findOne({ targetId: upload.targetId });
-    console.log("Target gevonden:", target);
 
     if (!target) return { msg: "Target niet gevonden" };
 

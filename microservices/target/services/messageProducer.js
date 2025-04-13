@@ -49,8 +49,6 @@ class Producer {
       { persistent: true }
     );
 
-    console.log("target: ", target);
-    console.log("message payload: ", messagePayload);
     console.log(`✅ Bericht verzonden naar fanout exchange "${exchangeName}"`);
   }
 }
