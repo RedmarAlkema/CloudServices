@@ -62,6 +62,24 @@ const getUploadFromRequest = async (req) => {
   }
 };
 
+exports.deleteUpload = async (req, res) => {
+  const { uploadId } = req.params;
+
+  try {
+    const deleted = await Upload.findOneAndDelete({ uploadId: uploadId });
+
+    if (!deleted) {
+      return res.status(404).json({ message: "Upload niet gevonden" });
+    }
+
+    return res.status(200).json({ message: "Upload succesvol verwijderd" });
+  } catch (err) {
+    console.error("Fout bij verwijderen upload:", err.message);
+    return res.status(500).json({ message: "Interne serverfout" });
+  }
+};
+
+
 
 module.exports = {
   uploadFile,

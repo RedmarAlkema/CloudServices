@@ -1,5 +1,6 @@
 const amqp = require('amqplib');
 const Upload = require('../models/Upload');
+const controller = require("../controllers/scoreController");
 
 async function consumeUpload() {
   try {
@@ -39,6 +40,9 @@ async function consumeUpload() {
           });
 
           await newUpload.save();
+          console.log("upload: ", newUpload )
+          score = await controller.getScoreId(newUpload);
+          console.log("Jouw score is: ", score);
           console.log("✅ Upload opgeslagen in read DB:", newUpload._id);
         } catch (err) {
           console.error("❌ Fout bij opslaan in MongoDB:", err.message);

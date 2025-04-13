@@ -2,18 +2,26 @@ const Target = require("../models/Target");
 
 exports.getAllTargets = async (req, res) => {
   try {
-    const targets = await Target.find();
+    const query = {};
 
-    const formatted = targets.map(t => ({
-      ...t.toObject(),
-      img: t.img?.data
-        ? `data:${t.img.contentType};base64,${t.img.data.toString("base64")}`
-        : null
-    }));
+    if (req.query.title) {
+      query.title = { $regex: req.query.title, $options: 'i' };
+    }
+    if (req.query.location) {
+      query.location = { $regex: req.query.location, $options: 'i' }; 
+    }
+    if (req.query.radius) {
+      query.radius = req.query.radius;
+    }
+    if (req.query.deadline) {
+      query.deadline = { $lte: new Date(req.query.deadline) }; 
+    }
 
-    res.status(200).json(formatted);
+    const targets = await Target.find(query);
+    res.status(200).json(targets);
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    console.error("Fout bij ophalen van targets:", err.message);
+    res.status(500).json({ message: "Er is iets fout gegaan" });
   }
 };
 
