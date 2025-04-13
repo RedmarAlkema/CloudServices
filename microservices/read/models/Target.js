@@ -1,6 +1,11 @@
 const mongoose = require("mongoose");
 
 const targetSchema = new mongoose.Schema({
+  targetId: {
+    type: mongoose.Schema.Types.ObjectId,
+    required: true,
+    unique: true
+  },
   title: String,
   location: String,
   description: String,

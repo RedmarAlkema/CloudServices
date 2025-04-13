@@ -14,6 +14,13 @@ module.exports = (req, res, next) => {
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     req.user = decoded;
+
+    if (req.method === 'POST' || req.method === 'DELETE') {
+      if (req.user.role !== 'admin') {
+        return res.status(403).json({ msg: "Niet geautoriseerd: Alleen admins mogen deze actie uitvoeren" });
+      }
+    }
+
     next();
   } catch (err) {
     return res.status(401).json({ msg: "Target: Token is ongeldig" });

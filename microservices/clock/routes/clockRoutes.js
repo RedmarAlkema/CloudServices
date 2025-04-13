@@ -5,5 +5,4 @@ router.get("/", (req, res) => {
   res.send("✅ Clock service draait!");
 });
 
-
 module.exports = router;

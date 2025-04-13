@@ -16,7 +16,7 @@ mongoose
   .connect(process.env.MONGO_URI)
   .then(() => {
     console.log("MongoDB connected");
-    app.listen(PORT, () => console.log(`Target service draait op poort ${PORT}`));
+    app.listen(PORT, () => console.log(`Clock service draait op poort ${PORT}`));
   })
   .catch((err) => console.log(err));
 

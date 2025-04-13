@@ -1,27 +1,67 @@
-const cron = require('node-cron');
-const Clock = require('../models/clock');
+const Clock = require("../models/Clock");
+const mongoose = require('mongoose');
+const moment = require('moment-timezone');
+const amqp = require('amqplib');
+const config = require('../routes/config');
 
-function startDeadlineChecker() {
-    cron.schedule('*/10 * * * * *', async () => { 
+class Producer {
+  channel;
 
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const tomorrow = new Date(today);
-    tomorrow.setDate(today.getDate() + 1);
+  async createChannel() {
+    const connection = await amqp.connect(config.rabbitMQ.url);
+    this.channel = await connection.createChannel();
+  }
 
-    try {
-      const dueTargets = await Clock.find({
-        deadline: { $gte: today, $lt: tomorrow },
-      });
-
-      dueTargets.forEach(target => {
-        console.log(`⏰ Tijd is over! Target ${target.targetId} is klaar.`);
-      });
-
-    } catch (err) {
-      console.error("❌ Fout bij het checken van deadlines:", err.message);
+  async publishMessage(targetId) {
+    if (!this.channel) {
+      await this.createChannel();
     }
-  });
+
+    const exchangeName = 'clock_exchange'; 
+
+    await this.channel.assertExchange(exchangeName, "fanout", { durable: true });
+
+    const messagePayload = { targetId };
+
+    this.channel.publish(
+      exchangeName,
+      "", 
+      Buffer.from(JSON.stringify(messagePayload)),
+      { persistent: true }
+    );
+
+    console.log("message payload: ", messagePayload);
+    console.log(`✅ Bericht verzonden naar fanout exchange "${exchangeName}"`);
+  }
 }
 
-module.exports = startDeadlineChecker;
+const producer = new Producer();
+
+async function checkAndDeleteExpiredTargets() {
+  try {
+    const clocks = await Clock.find();
+
+    const currentTime = moment.tz('Europe/Amsterdam').toISOString();
+
+    for (const clock of clocks) {
+      const clockDeadline = moment.utc(clock.deadline).toISOString();
+
+      if (clockDeadline <= currentTime) {
+        console.log(`❌ Deadline passed for target ${clock.targetId}. Sending to RabbitMQ...`);
+        
+        await producer.publishMessage(clock.targetId); 
+        
+        console.log(`❌ Deleting target ${clock.targetId}...`);
+        await Clock.findByIdAndDelete(clock._id);
+
+        console.log(`✅ Target ${clock._id} deleted.`);
+      }
+    }
+  } catch (err) {
+    console.error("❌ Error while checking targets:", err.message);
+  }
+}
+
+setInterval(checkAndDeleteExpiredTargets, 5000);
+
+module.exports = checkAndDeleteExpiredTargets;
