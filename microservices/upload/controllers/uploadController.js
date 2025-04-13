@@ -62,7 +62,7 @@ const getUploadFromRequest = async (req) => {
   }
 };
 
-exports.deleteUpload = async (req, res) => {
+  const deleteUpload = async (req, res) => {
   const { uploadId } = req.params;
 
   try {
@@ -83,5 +83,6 @@ exports.deleteUpload = async (req, res) => {
 
 module.exports = {
   uploadFile,
-  getUploadFromRequest
+  getUploadFromRequest,
+  deleteUpload
 };

@@ -1,5 +1,5 @@
 const amqp = require('amqplib');
-const Clock = require('../models/clock');
+const Clock = require('../models/Clock');
 
 async function consumeTarget() {
     try {

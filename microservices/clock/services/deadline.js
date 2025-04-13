@@ -17,7 +17,7 @@ class Producer {
       await this.createChannel();
     }
 
-    const exchangeName = 'clock_exchange';  // Exchange name set to "clock_exchange"
+    const exchangeName = 'clock_exchange'; 
 
     await this.channel.assertExchange(exchangeName, "fanout", { durable: true });
 

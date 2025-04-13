@@ -7,14 +7,12 @@ const { uploadFile } = require('../controllers/uploadController');
 const { getUploadFromRequest } = require("../controllers/uploadController")
 const Producer = require("../services/messageProducer");
 
-router.post('/', auth, upload.single('upload'), uploadFile);
-
 router.post("/sendFile", auth, upload.any(), uploadFile, async (req, res, next) => {
     await Producer.publishMessage("Info", uploadController.getUploadFromRequest(req))
     res.send();
 });
 
-router.post("/test", auth, upload.any(), async (req, res) => {
+router.post("/", auth, upload.any(), async (req, res) => {
     try {
         const upload = await getUploadFromRequest(req);
         await upload.save();
@@ -25,5 +23,8 @@ router.post("/test", auth, upload.any(), async (req, res) => {
         res.status(500).json({ message: "Er is iets fout gegaan" });
     }
 });
+
+router.delete("/:uploadId", auth, uploadController.deleteUpload);
+
 
 module.exports = router;

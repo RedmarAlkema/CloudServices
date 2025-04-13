@@ -31,12 +31,10 @@ class GetDeadline {
           try {
             console.log(`Received targetId: ${targetId}`);
             
-            // Simulate req object to match getWinner's expected parameter structure
             const simulatedReq = { params: { targetId } };
-            const winner = await this.getWinner(simulatedReq); // Pass simulated req with targetId
+            const winner = await this.getWinner(simulatedReq); 
             console.log(`Winner for target ${targetId}:`, winner);
 
-            // Acknowledge the message after processing
             this.channel.ack(msg);
           } catch (err) {
             console.error(`❌ Error processing message for targetId ${targetId}:`, err.message);
@@ -50,7 +48,6 @@ class GetDeadline {
 
   async getWinner(req) {
     try {
-      // Now that we are passing the req object correctly, the targetId can be accessed from req.params
       const targetId = req.params.targetId;
       const winner = await getWinner(targetId); 
       return winner;
