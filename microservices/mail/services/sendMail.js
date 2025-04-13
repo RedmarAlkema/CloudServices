@@ -1,3 +1,5 @@
+require('dotenv').config();
+
 const nodemailer = require("nodemailer");
 
 const transporter = nodemailer.createTransport({
@@ -23,7 +25,7 @@ async function sendRegisterMail(email) {
     await transporter.sendMail(mailOptions);
     console.log(`📧 E-mail verzonden naar ${email}`);
   } catch (err) {
-    console.error("❌ Fout bij verzenden van e-mail:", err.message);
+    console.error("❌ Fout bij verzenden van e-mail:", err);
   }
 }
 
